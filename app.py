@@ -1,6 +1,7 @@
 import uvicorn
 
 from fastapi import FastAPI, status
+
 from src.payments.api.payments import payments_router
 from src.wallet.api.wallet import wallet_router
 
@@ -23,7 +24,7 @@ def healthcheck():
 
 if __name__ == "__main__":
     uvicorn.run(
-        app=app,
-        host="127.0.0.1",
-        port=9876
+        app=app,           # .env
+        host="127.0.0.1",  # .env
+        port=9876          # .env
     )
