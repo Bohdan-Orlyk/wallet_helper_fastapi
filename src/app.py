@@ -9,6 +9,11 @@ from src.wallet.api.wallet import wallet_router
 
 app = FastAPI()
 
+ROUTERS = [
+    payments_router,
+    wallet_router,
+]
+
 
 class HealthcheckResponse(BaseModel):
     status: int = status.HTTP_200_OK
@@ -21,11 +26,6 @@ def healthcheck() -> dict:
 
 
 if __name__ == "__main__":
-
-    ROUTERS = [
-        payments_router, wallet_router,
-    ]
-
     [app.include_router(router) for router in ROUTERS]
 
     uvicorn.run(app=app, host="127.0.0.1", port=9876)  # .env
