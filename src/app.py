@@ -16,7 +16,7 @@ class HealthcheckResponse(BaseModel):
 
 
 @app.get("/", response_model=HealthcheckResponse)
-def healthcheck():
+def healthcheck() -> dict:
     return {}
 
 
