@@ -1,13 +1,11 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from dotenv import find_dotenv
-
-conf_file = find_dotenv()
+from src.app_config import env_file
 
 
 class DbConfig(BaseSettings):
     DB_URL: str
 
-    model_config = SettingsConfigDict(env_file=conf_file)
+    model_config = SettingsConfigDict(env_file=env_file, extra="ignore")
 
 
 db_config = DbConfig()
