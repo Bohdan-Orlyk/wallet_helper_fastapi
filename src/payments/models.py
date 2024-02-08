@@ -15,7 +15,7 @@ class Payment(Base):
     price = Column(Float, nullable=False)
     payment_date = Column(TIMESTAMP, default=set_payment_date)
 
-    payment_type = Column(String, ForeignKey('payment_types.id'),  nullable=False)
+    payment_type = Column(Integer, ForeignKey('payment_types.id'),  nullable=False)
 
 
 class PaymentTypes(Base):
