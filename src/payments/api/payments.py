@@ -1,6 +1,10 @@
 from fastapi import APIRouter, status, HTTPException, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.payments.schemas import AllPaymentsSchema, PaymentSchema
+from src.payments.schemas import Payment, PaymentCreate
+from src.payments.services.payments_database_service import PaymentsDbService
+
+from database.db import db_helper
 
 
 payments_router = APIRouter(
@@ -9,17 +13,16 @@ payments_router = APIRouter(
 )
 
 
-@payments_router.get("", response_model=AllPaymentsSchema)
-def get_payments_history() -> dict:
+@payments_router.get("/", response_model=list[Payment])
+async def get_payments_history(session: AsyncSession = Depends(db_helper.get_session),
+                               payment_db_service: PaymentsDbService = Depends(PaymentsDbService)) -> list:
     """ Shows all payments """
+    payments: list = await payment_db_service.get_payments(session=session)
 
-    # payments: dict = get_payments()
-
-    # return payments
-    pass
+    return payments
 
 
-@payments_router.get("/{payment_id}", response_model=PaymentSchema)
+@payments_router.get("/{payment_id}", response_model=Payment)
 def get_payment_by_id(payment_id: int) -> dict:
     """ Shows payment by given `id` """
 
@@ -29,7 +32,7 @@ def get_payment_by_id(payment_id: int) -> dict:
     pass
 
 
-@payments_router.get("/{payments_month}", response_model=PaymentSchema)
+@payments_router.get("/{payments_month}", response_model=Payment)
 def get_payments_by_month(payment_month: int) -> dict:
     """ Shows payment by `month` """
 
@@ -39,10 +42,13 @@ def get_payments_by_month(payment_month: int) -> dict:
     pass
 
 
-@payments_router.post("")
-def book_payment_to_wallet() -> dict:
+@payments_router.post("/", response_model=Payment)
+async def book_payment_to_wallet(
+                                payment: PaymentCreate,
+                                session: AsyncSession = Depends(db_helper.get_session),
+                                payment_db_service: PaymentsDbService = Depends(PaymentsDbService)) -> Payment:
     """ Book the payment """
-    pass
+    return await payment_db_service.create_payment(session, payment)
 
 
 @payments_router.put("/{payment_id}")
