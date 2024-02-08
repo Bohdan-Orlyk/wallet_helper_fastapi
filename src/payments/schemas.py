@@ -11,7 +11,13 @@ class PaymentBase(BaseModel):
 class Payment(PaymentBase):
     id: int
     payment_date: datetime
+    payment_type: str
 
 
 class PaymentCreate(PaymentBase):
-    pass
+    payment_type: int = 0
+
+
+class PaymentCreateSuccess(BaseModel):
+    status: int = 201
+    message: str
