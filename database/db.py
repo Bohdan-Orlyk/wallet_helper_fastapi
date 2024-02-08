@@ -1,41 +1,35 @@
-import sqlite3
+from asyncio import current_task
 
-from abc import ABC, abstractmethod
+from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, async_scoped_session, AsyncSession
 
-
-class Database(ABC):
-    """
-    Database context manager
-    """
-    def __init__(self, driver) -> None:
-        self.driver = driver
-
-    @abstractmethod
-    def connect_to_database(self):
-        pass
-
-    def __enter__(self):
-        self.connection = self.connect_to_database()
-        self.cursor = self.connection.cursor()
-        return self
-
-    def __exit__(self, exception_type, exc_val, traceback):
-        self.cursor.close()
-        self.connection.close()
+from .db_config import db_config
 
 
-class SQLiteDatabase(Database):
-    """
-    SQLite database context manager
-    """
-    DB_NAME = "wallet.db"  # .env
-
-    def __init__(self) -> None:
-        self.driver = sqlite3
-        super().__init__(self.driver)
-
-    def connect_to_database(self):
-        return self.driver.connect(self.DB_NAME)
+class Base(DeclarativeBase):
+    pass
 
 
-sqlite_db = SQLiteDatabase()
+class DataBaseHelper:
+    def __init__(self, url: str, echo: bool = False):
+        self.engine = create_async_engine(
+            url=url,
+            echo=echo
+        )
+        self.session_factory = async_sessionmaker(
+            bind=self.engine,
+            autoflush=False,
+            autocommit=False,
+            expire_on_commit=False
+        )
+
+    async def get_session(self) -> AsyncSession:
+        async with self.session_factory() as session:
+            yield session
+            await session.close()
+
+
+db_helper = DataBaseHelper(
+    url=db_config.DB_URL,
+    echo=db_config.BD_ECHO
+)

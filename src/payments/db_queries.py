@@ -1,4 +1,0 @@
-
-
-class SqlQueries:
-    pass
